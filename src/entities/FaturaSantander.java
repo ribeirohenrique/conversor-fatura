@@ -1,13 +1,13 @@
 package entities;
 
-public class Fatura {
+public class FaturaSantander {
     private String tipoCompra;
     private String dataCompra;
     private String nomeLocal;
     private String numParcelas;
     private String valorCompra;
 
-    public Fatura(String tipoCompra, String dataCompra, String nomeLocal, String valorCompra, String numParcelas) {
+    public FaturaSantander(String tipoCompra, String dataCompra, String nomeLocal, String valorCompra, String numParcelas) {
         this.tipoCompra = tipoCompra;
         this.dataCompra = dataCompra;
         this.nomeLocal = nomeLocal;
@@ -15,7 +15,7 @@ public class Fatura {
         this.numParcelas = numParcelas;
     }
 
-    public Fatura() {
+    public FaturaSantander() {
     }
 
     @Override
