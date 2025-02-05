@@ -27,3 +27,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/src/faturaInter.txt
+/src/faturaSantander.txt
+/src/*.csv
