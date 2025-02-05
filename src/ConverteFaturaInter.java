@@ -2,38 +2,32 @@ import entities.FaturaInter;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ConverteFaturaInter {
     public static void main(String[] args) {
         List<FaturaInter> faturaList = new ArrayList<>();
-        String path = "C:\\Users\\henrique.r.mendes\\Documentos\\conversor-fatura\\src\\faturaInter.txt";
+        String path = "src/faturaInter.txt";
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
             String faturaCsv = bufferedReader.readLine();
             while (faturaCsv != null) {
-                String regex = "(\\d{2})\\s+de\\s+([a-zç]{3,})\\.\\s+(\\d{4})\\s+(.+?)\\s+-\\s+R\\$\\s+([\\d,.]+)";
+                // Regex ajustada para capturar opcionalmente as parcelas
+                String regex = "(\\d{2})\\s+de\\s+([a-zç]{3,})\\.\\s+(\\d{4})\\s+(.+?)(?:\\s*\\(Parcela\\s*(\\d{2})\\s*de\\s*(\\d{2})\\))?\\s*-\\s*R\\$\\s*([\\d,.]+)";
                 Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(faturaCsv);
 
                 if (matcher.find()) {
                     String dia = matcher.group(1);
-                    System.out.println("dia: " + dia);
-
                     String mesExtenso = matcher.group(2).toLowerCase();
-                    System.out.println("mesExtenso: " + mesExtenso);
-
                     String descricao = matcher.group(4).trim();
-                    System.out.println("descricao: " + descricao);
+                    String parcelaAtual = matcher.group(5);
+                    String totalParcelas = matcher.group(6);
+                    String valor = matcher.group(7);
 
-                    String valor = matcher.group(5);
-                    System.out.println("valor: " + valor);
-
-                    // Convertendo o mês por extenso para numérico
+                    // Convertendo o mês para número
                     String mes = mesParaNumero(mesExtenso);
                     if (mes == null) {
                         System.out.println("Mês inválido encontrado: " + mesExtenso);
@@ -41,10 +35,14 @@ public class ConverteFaturaInter {
                         continue;
                     }
 
+                    // Formatando data
                     String data = dia + "/" + mes;
 
-                    // Adicionando a fatura à lista
-                    faturaList.add(new FaturaInter(data, descricao, valor));
+                    // Formatando parcelas
+                    String parcelas = (parcelaAtual != null && totalParcelas != null) ? parcelaAtual + "/" + totalParcelas : "-";
+
+                    // Adicionando à lista
+                    faturaList.add(new FaturaInter(data, descricao, parcelas, valor));
                 } else {
                     System.out.println("A linha não corresponde ao padrão esperado.");
                     System.out.println("Linha: " + faturaCsv);
@@ -55,12 +53,13 @@ public class ConverteFaturaInter {
             System.out.println("Error: " + e.getMessage());
         }
 
+        // Criando nome do arquivo de saída
         SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy__HH_mm_ss");
         Date date = new Date();
-        String arquivoSaida = "C:\\Users\\henrique.r.mendes\\Documentos\\conversor-fatura\\src\\faturaInterConvertida_" + sdf.format(date) + ".csv";
+        String arquivoSaida = "src\\faturaInterConvertida_" + sdf.format(date) + ".csv";
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(arquivoSaida, true))) {
-            bufferedWriter.write("tipoCompra;dataCompra;nomeLocal;numParcelas;valorCompra\n");
+            bufferedWriter.write("dataCompra;nomeLocal;numParcelas;valorCompra\n");
             for (FaturaInter fatura : faturaList) {
                 bufferedWriter.write(fatura.toString());
                 bufferedWriter.newLine();
@@ -68,23 +67,24 @@ public class ConverteFaturaInter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Conversão de fatura Inter efetuada com sucesso.");
     }
 
     private static String mesParaNumero(String mesExtenso) {
-        switch (mesExtenso) {
-            case "jan": return "01";
-            case "fev": return "02";
-            case "mar": return "03";
-            case "abr": return "04";
-            case "mai": return "05";
-            case "jun": return "06";
-            case "jul": return "07";
-            case "ago": return "08";
-            case "set": return "09";
-            case "out": return "10";
-            case "nov": return "11";
-            case "dez": return "12";
-            default: return null; // Caso o mês não seja reconhecido
-        }
+        return switch (mesExtenso) {
+            case "jan" -> "01";
+            case "fev" -> "02";
+            case "mar" -> "03";
+            case "abr" -> "04";
+            case "mai" -> "05";
+            case "jun" -> "06";
+            case "jul" -> "07";
+            case "ago" -> "08";
+            case "set" -> "09";
+            case "out" -> "10";
+            case "nov" -> "11";
+            case "dez" -> "12";
+            default -> null; // Caso o mês não seja reconhecido
+        };
     }
 }
