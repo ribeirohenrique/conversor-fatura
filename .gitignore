@@ -30,3 +30,7 @@ bin/
 /src/faturaInter.txt
 /src/faturaSantander.txt
 /src/*.csv
+
+faturaInter.txt
+faturaSantander.txt
+*.csv

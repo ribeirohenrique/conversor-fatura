@@ -11,11 +11,12 @@ public class ConverteFaturaInter {
         List<FaturaInter> faturaList = new ArrayList<>();
         String path = "src/faturaInter.txt";
 
+
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
             String faturaCsv = bufferedReader.readLine();
             while (faturaCsv != null) {
                 // Regex ajustada para capturar opcionalmente as parcelas
-                String regex = "(\\d{2})\\s+de\\s+([a-zç]{3,})\\.\\s+(\\d{4})\\s+(.+?)(?:\\s*\\(Parcela\\s*(\\d{2})\\s*de\\s*(\\d{2})\\))?\\s*-\\s*R\\$\\s*([\\d,.]+)";
+                String regex = "(\\d{2})\\s+de\\s+([a-zç]{3,})\\.\\s+(\\d{4})\\s+(.+?)(?:\\s+Parcela\\s*(\\d{2})\\s+de\\s+(\\d{2}))?\\s*-\\s*R\\$\\s*([\\d,.]+)";
                 Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(faturaCsv);
 
@@ -35,11 +36,15 @@ public class ConverteFaturaInter {
                         continue;
                     }
 
-                    // Formatando data
-                    String data = dia + "/" + mes;
+                    int anoFatura = Integer.parseInt(matcher.group(3));
+                    int diaFatura = Integer.parseInt(dia);
+                    int mesFatura = Integer.parseInt(mes);
+
+                    // Sempre formata como dd/MM/yyyy
+                    String data = String.format("%02d/%02d/%d", diaFatura, mesFatura, anoFatura);
 
                     // Formatando parcelas
-                    String parcelas = (parcelaAtual != null && totalParcelas != null) ? parcelaAtual + "/" + totalParcelas : "-";
+                    String parcelas = (parcelaAtual != null && totalParcelas != null) ? parcelaAtual + "|" + totalParcelas : "-";
 
                     // Adicionando à lista
                     faturaList.add(new FaturaInter(data, descricao, parcelas, valor));
