@@ -33,4 +33,5 @@ bin/
 
 faturaInter.txt
 faturaSantander.txt
+faturaItau.txt
 *.csv

@@ -1,0 +1,6 @@
+12/08 compra1 12/12 23,00
+23/09 compra2 11/12 12,34
+17/10 compra1parcelada10/10 150,00
+23/10 compra2parcelada 10/12 190,00
+09/07 compra3 70,00
+09/07 compra4 40,00
